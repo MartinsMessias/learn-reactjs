@@ -14,8 +14,7 @@ class Course extends Component{
     remove(){
         this.props.onRemove(this.props.course.id);
     }
-
-    // eslint-disable-next-line react/require-render-return
+    // eslint-disable-next-line
     render() {
         const { props } = this,
             { course } = props;

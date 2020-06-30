@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Course from "./components/courses";
 import NewCourseForm from "./components/newCourseForm";
+import { CategoryService} from "./services/CategoryService";
+import { CourseService} from "./services/CourseService";
 import './App.css';
 
 
@@ -9,42 +11,34 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      courses: [
-          {
-              id: 1,
-              name: 'React',
-              category: 'JavaScript',
-              image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png',
-          },
-          {
-              id: 2,
-              name: 'React',
-              category: 'JavaScript',
-              image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png',
-          },
-          {
-              id: 3,
-              name: 'React',
-              category: 'JavaScript',
-              image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png',
-          }
-      ]
+      courses: [], categories: []
     }
     this.remove = this.remove.bind(this);
     this.add = this.add.bind(this);
+    this.startData = this.startData.bind(this);
+    this.startData();
   }
 
-    add(course){
+    async startData(){
+        const [courses, categories] = await Promise.all([CourseService.list(), CategoryService.list()]);
+
+      this.setState({
+          courses,
+          categories
+      });
+    }
+
+    async add(course){
       const {courses} = this.state,
-          newCourse = Object.assign({}, course, {id: (Date.now())})
-      courses.push(course);
+          newCourse = await CourseService.create(course);
+      courses.push(newCourse);
       this.setState({courses});
 
 }
-  remove(courseId){
+  async remove(courseId){
       const {courses} = this.state,
-          courseIndex = courses.findIndex(courses => courseId === courses.id);
-
+          courseIndex = courses.findIndex(course => courseId === course.id);
+      await CourseService.remove(courseId);
       courses.splice(courseIndex, 1);
       this.setState({courses});
   }
@@ -53,7 +47,7 @@ class App extends Component {
       const {state} = this;
     return (
         <div className="App">
-            <NewCourseForm onSubmit={this.add} />
+            <NewCourseForm onSubmit={this.add} categories={state.categories} />
           <ul className="courses-list">
               {
                   state.courses.map(course => <Course course={course} onRemove={this.remove}/>)

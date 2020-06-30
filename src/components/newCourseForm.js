@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 
-// eslint-disable-next-line no-unused-vars
 class NewCourseForm extends Component{
 
     static defaultProps = {
+        categories: [],
         onSubmit: () => {}
     }
 
@@ -29,7 +29,7 @@ class NewCourseForm extends Component{
                 name: '',
                 // category: '',
                 image: '',
-            })
+            });
         }
 
     }
@@ -59,7 +59,11 @@ class NewCourseForm extends Component{
                     <span>Categoria: </span>
                    <select name="category" onChange={this.handleChange} value={state.category}>
                        <option value=''>Selecionar</option>
-                       <option value='a'>AAAAA</option>
+                       {
+                            props.categories.map(category => (
+                                <option value={category.name}>{category.name}</option>
+                            ))
+                       }
                    </select>
                 </label>
                 <button type="submit">Criar curso</button>
